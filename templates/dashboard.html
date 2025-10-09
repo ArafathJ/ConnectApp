@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="dashboard-header">
+        <h2>Welcome back, {{ user.name }}! 👋</h2>
+    </div>
+
+    <div class="card">
+        <h3>Today's Mission</h3>
+        <p class="task-text">"{{ task.task_text }}"</p>
+    </div>
+
+    <div class="card">
+        <h3>Connect with Someone New</h3>
+        <p>Enter the referral code of the person you met:</p>
+        <form action="{{ url_for('add_connection') }}" method="POST" class="connect-form">
+            <input type="text" name="referral_code" placeholder="Enter Referral Code" required>
+            <button type="submit" class="btn">Connect</button>
+        </form>
+    </div>
+    
+    <div class="card">
+        <h3>Recent Connections</h3>
+        {% if connections %}
+            <ul class="connections-list">
+                {% for friend in connections %}
+                    <li>{{ friend.name }}</li>
+                {% endfor %}
+            </ul>
+             <a href="{{ url_for('connections') }}" class="view-all">View all connections &rarr;</a>
+        {% else %}
+            <p>You haven't made any connections yet. Use your daily task to meet someone!</p>
+        {% endif %}
+    </div>
+{% endblock %}
