@@ -3,10 +3,15 @@ import random
 from datetime import date
 import io
 import base64
-from flask import Flask, render_template, redirect, url_for, flash, request, send_file
+from flask import Flask, render_template, redirect, url_for, flash, request, send_file, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from models import db, User, DailyTask
 from werkzeug.utils import secure_filename
+from google import genai
+from sample import GEMINI_API_KEY
+
+
+
 
 # Optional QR Code generation
 try:
@@ -27,6 +32,37 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'static/profile_pics')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
+#--- Gemini Configuration ----------
+client = genai.Client(api_key=GEMINI_API_KEY)
+
+
+
+@app.route("/ai_suggest", methods=["POST"])
+def ai_suggest():
+    """Generate AI suggestion for a given task text."""
+    data = request.get_json()
+    task_text = data.get("task", "")
+    if not task_text:
+        return jsonify({"error": "Task text missing"}), 400
+
+    prompt = f"""
+    You are an assistant helping users plan their daily tasks.
+    The task is: "{task_text}"
+    Give only 1-2 short, practical steps on how to approach this task effectively.
+    Keep it friendly and under 50 words.
+    """
+
+    try:
+        response = client.models.generate_content(
+        model="gemini-2.5-flash", contents=prompt
+        )
+        print(response.text)
+
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "AI suggestion failed"}), 500
+    
+# --- for uploading provision file format------
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']

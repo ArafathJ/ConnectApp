@@ -9,6 +9,13 @@
     <div class="card">
         <h3>Today's Mission</h3>
         <p class="task-text">"{{ task.task_text }}"</p>
+        <div class="task-item">
+        <p>{{ task.description }}</p>
+        <button class="ai-btn" onclick="getSuggestion('{{ task.description }}', this)">
+    💡 AI Suggest
+    </button>
+  <div class="suggestion" style="margin-top:5px; color:#4CAF50;"></div>
+</div>
     </div>
 
     <div class="card">
@@ -33,4 +40,27 @@
             <p>You haven't made any connections yet. Use your daily task to meet someone!</p>
         {% endif %}
     </div>
+
+    <script>
+        async function getSuggestion(task, btn) {
+        btn.innerText = "Thinking...";
+        try {
+            const res = await fetch("/ai_suggest", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ task })
+        });
+            const data = await res.json();
+            if (data.suggestion) {
+            btn.nextElementSibling.innerHTML = `<b>Suggestion:</b> ${data.suggestion}`;
+        } else {
+        btn.nextElementSibling.innerHTML = "⚠️ Failed to get suggestion.";
+        }
+    } catch (err) {
+        btn.nextElementSibling.innerHTML = "⚠️ Error connecting to AI.";
+    }
+        btn.innerText = "💡 AI Suggest";
+    }
+    </script>
+
 {% endblock %}
