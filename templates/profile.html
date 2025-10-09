@@ -31,10 +31,11 @@
     <div class="referral-section">
       <h4>Your Unique Referral Code</h4>
       <p class="referral-code">{{ user.referral_code }}</p>
-      <p>Share this code with people you meet in real life!</p>
+      <!-- <p>Share this code with people you meet in real life!</p>
       <div class="qr-code">
         <img src="{{ url_for('generate_qr') }}" alt="Your Referral QR Code">
-      </div>
+      </div> -->
+      <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
     </div>
   </div>
 </div>
