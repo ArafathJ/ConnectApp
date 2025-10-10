@@ -23,6 +23,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     referral_code = db.Column(db.String(8), unique=True, nullable=False)
     profile_pic = db.Column(db.String(200), default='default.jpg')
+    score = db.Column(db.Integer, default=0)
     tasks = db.relationship('DailyTask', backref='user', lazy=True)
     
 
@@ -69,7 +70,7 @@ class DailyTask(db.Model):
     task_date = db.Column(db.Date, nullable=False)
     difficulty_level = db.Column(db.String(50), default="normal")  # "normal" or "easy"
     simplified_count = db.Column(db.Integer, default=0)  # how many times simplified this week
-
+    xp_points = db.Column(db.Integer, default=10)
 
     def __repr__(self):
         return f'<Task {self.task_text}>'

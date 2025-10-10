@@ -11,6 +11,13 @@
         <h3 id="timer">00:00:00</h3>
     </div>
 
+    <div class="user-info">
+        <p>Referral Code: <b>{{ current_user.referral_code }}</b></p>
+        <p>Your XP: <b>{{ current_user.score }}</b></p>
+    </div>
+
+
+
     <div class="card">
     <h3>Today's Mission</h3>
     <p class="task-text">{{ task.task_text }}</p>
@@ -22,6 +29,10 @@
 
     <div class="suggestion" style="margin-top:5px; color:#4CAF50;"></div>
 </div>
+
+    <button id="complete-task-btn">Complete Task ✅</button>
+    <div class="task-feedback"></div>
+
 
     <div class="card">
         <h3>Connect with Someone New</h3>
@@ -158,6 +169,30 @@ function updateTimer() {
 const timerInterval = setInterval(updateTimer, 1000);
 updateTimer();
 
+
+document.getElementById("complete-task-btn").addEventListener("click", async () => {
+    const feedbackDiv = document.querySelector(".task-feedback");
+    feedbackDiv.innerHTML = "Completing task...";
+
+    try {
+        const response = await fetch("/complete_task", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ task_id: {{ task.id }} })
+        });
+
+        const data = await response.json();
+
+        if (data.new_score) {
+            feedbackDiv.innerHTML = `🎉 Task completed! You earned ${data.xp_gained} XP. Total XP: ${data.new_score}`;
+        } else {
+            feedbackDiv.innerHTML = data.error || "Failed to complete task 😕";
+        }
+    } catch (err) {
+        feedbackDiv.innerHTML = "Failed to complete task 😕";
+        console.error(err);
+    }
+});
 </script>
 
 {% endblock %}

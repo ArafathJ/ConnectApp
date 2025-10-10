@@ -10,6 +10,7 @@ from werkzeug.utils import secure_filename
 from google import genai
 from sample import GEMINI_API_KEY
 from datetime import datetime, date, timedelta
+from referal import generate_referral_code
 
 
 
@@ -86,7 +87,7 @@ def get_daily_task(user):
 
             # Handle possible response formats
             task_text = getattr(response, "text", None)
-            if not task_text and hasattr(response, "candidates"):
+            if not task_text and hasattr(response + 'and add to the connection', "candidates"):
                 task_text = response.candidates[0].content[0].text.strip()
 
             if not task_text:
@@ -121,6 +122,7 @@ def register():
         age = request.form.get('age')
         email = request.form.get('email')
         password = request.form.get('password')
+        referral = request.form.get('referral')
 
         user_exists = User.query.filter_by(email=email).first()
         if user_exists:
@@ -133,7 +135,24 @@ def register():
             email=email,
             referral_code=User.generate_referral_code()
         )
-        new_user.set_password(password)
+        if referral:
+            referrer = User.query.filter_by(referral_code=referral).first()
+            if referrer:
+                new_user.referred_by = referral
+
+                # Reward both users
+                referrer.score += 20
+                new_user.score += 20
+
+                # Optionally mark today's task as completed for referrer
+                today = datetime.date.today()
+                task = DailyTask.query.filter_by(user_id=referrer.id, task_date=today).first()
+                if task and not task.completed:
+                    task.completed = True
+                    task.xp_points = 20  # bonus XP for referral
+            else:
+                print("Invalid referral code entered")
+
         db.session.add(new_user)
         db.session.commit()
         
@@ -265,6 +284,32 @@ def simplify_task():
         print(e)
         return jsonify({"error": "Simplifying task failed"}), 500
 
+@app.route("/complete_task", methods=["POST"])
+@login_required
+def complete_task():
+    data = request.get_json()
+    task_id = data.get("task_id")
+    task = DailyTask.query.filter_by(id=task_id, user_id=current_user.id).first()
+    
+    if not task:
+        return jsonify({"error": "Task not found"}), 404
+
+    if task.completed:
+        return jsonify({"error": "Task already completed"}), 400
+
+    # Mark as completed
+    task.completed = True
+
+    # Add XP to user score
+    current_user.score += task.xp_points
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Task completed!",
+        "new_score": current_user.score,
+        "xp_gained": task.xp_points
+    })
 
 
 
