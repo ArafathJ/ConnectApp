@@ -504,4 +504,52 @@ nav {
   color: #777;
   font-size: 13px;
 }
-style.css
+/* ///// */
+
+
+
+/* ai inbox start  */
+
+ .suggestion-out {
+  width: 500px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.suggestion {
+  background: linear-gradient(145deg, #1e1e2f8c, #2b2b3d);
+  border: 1px solid #ffffff;
+  border-radius: 12px;
+  padding: 20px 18px;
+  font-size: 15px;
+  line-height: 1.6;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  position: relative;
+  animation: fadeIn 0.5s ease-in-out;
+  color: #fff;
+  width: 135%;
+}
+
+.suggestion::before {
+  content: "🤖";
+  position: absolute;
+  left: -32px;
+  top: 10px;
+  font-size: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 
+ 
+ /* ai inbox ends */

@@ -117,6 +117,7 @@ def get_daily_task(user):
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
         name = request.form.get('name')
         age = request.form.get('age')
@@ -124,43 +125,56 @@ def register():
         password = request.form.get('password')
         referral = request.form.get('referral')
 
+        # Check if user already exists
         user_exists = User.query.filter_by(email=email).first()
         if user_exists:
             flash('An account with this email already exists.', 'error')
             return redirect(url_for('register'))
 
+        # Create new user
         new_user = User(
             name=name,
             age=age,
             email=email,
+            password=password,
             referral_code=User.generate_referral_code()
         )
-        new_user.set_password(password)
+
+        # Handle referral logic
         if referral:
             referrer = User.query.filter_by(referral_code=referral).first()
             if referrer:
-                
-                new_user.referred_by = referral
+                # ✅ Check if this referral was already used
+                already_used = ReferralHistory.query.filter_by(referred_id=referrer.id).first()
+                if already_used:
+                    flash('This referral code has already been used once and cannot be reused.', 'error')
+                else:
+                    # ✅ Reward both users
+                    referrer.score += 20
+                    new_user.score += 20
 
-                # Reward both users
-                referrer.score += 20
-                new_user.score += 20
+                    # ✅ Mark referral in history
+                    record = ReferralHistory(
+                        referrer_id=referrer.id,
+                        referred_id=new_user.id,
+                        date=datetime.utcnow()
+                    )
+                    db.session.add(record)
 
-                # Optionally mark today's task as completed for referrer
-                today = datetime.date.today()
-                task = DailyTask.query.filter_by(user_id=referrer.id, task_date=today).first()
-                if task and not task.completed:
-                    task.completed = True
-                    task.xp_points = 20  # bonus XP for referral
+                    # Optionally mark today’s task as complete for referrer
+                    today = datetime.date.today()
+                    task = DailyTask.query.filter_by(user_id=referrer.id, task_date=today).first()
+                    if task and not task.completed:
+                        task.completed = True
+                        task.xp_points = 20
             else:
-                print("Invalid referral code entered")
+                flash("Invalid referral code entered.", "error")
 
         db.session.add(new_user)
         db.session.commit()
-        
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('login'))
-        
+
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])

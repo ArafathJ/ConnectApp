@@ -21,13 +21,19 @@
     <div class="card">
     <h3>Today's Mission</h3>
     <p class="task-text">{{ task.task_text }}</p>
-    <button class="ai-btn" onclick="getSuggestion('{{ task.task_text }}', this)">
+    <button class="ai-btn upload-btn" onclick="getSuggestion('{{ task.task_text }}', this)">
         💡 AI Suggest
     </button>
-    <button id="simplify-task-btn">Simplify Task</button>
+    <button id="simplify-task-btn " class = "upload-btn">Simplify Task</button>
     <div class="simplified-task"></div>
 
-    <div class="suggestion" style="margin-top:5px; color:#4CAF50;"></div>
+   <div class="suggestion-out">
+            <div class="suggestion">
+                <!-- Gemini: Sure! Here’s your answer — The capital of France is Paris 🇫🇷. -->
+                Click ai suggestion for explain task
+
+            </div>
+        </div>
 </div>
 
 
@@ -36,7 +42,7 @@
         <p>Enter the referral code of the person you met:</p>
         <form action="{{ url_for('add_connection') }}" method="POST" class="connect-form">
             <input type="text" name="referral_code" placeholder="Enter Referral Code" required>
-            <button type="submit" class="btn">Connect</button>
+            <button type="submit" class="btn upload-btn">Connect</button>
         </form>
     </div>
     
