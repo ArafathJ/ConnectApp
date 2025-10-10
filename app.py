@@ -135,9 +135,11 @@ def register():
             email=email,
             referral_code=User.generate_referral_code()
         )
+        new_user.set_password(password)
         if referral:
             referrer = User.query.filter_by(referral_code=referral).first()
             if referrer:
+                
                 new_user.referred_by = referral
 
                 # Reward both users

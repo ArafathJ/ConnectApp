@@ -3,6 +3,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import string
 import random
+from datetime import datetime
 from datetime import date
 
 db = SQLAlchemy()
@@ -71,6 +72,14 @@ class DailyTask(db.Model):
     difficulty_level = db.Column(db.String(50), default="normal")  # "normal" or "easy"
     simplified_count = db.Column(db.Integer, default=0)  # how many times simplified this week
     xp_points = db.Column(db.Integer, default=10)
+
+
+class ReferralHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    referrer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    referred_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
 
     def __repr__(self):
         return f'<Task {self.task_text}>'
