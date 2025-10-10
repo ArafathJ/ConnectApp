@@ -6,6 +6,11 @@
         <h2>Welcome back, {{ user.name }}! 👋</h2>
     </div>
 
+    <div class=" card-time">
+        <h3>Time Left</h3>
+        <h3 id="timer">00:00:00</h3>
+    </div>
+
     <div class="card">
     <h3>Today's Mission</h3>
     <p class="task-text">{{ task.task_text }}</p>
@@ -39,6 +44,23 @@
         {% else %}
             <p>You haven't made any connections yet. Use your daily task to meet someone!</p>
         {% endif %}
+    </div>
+
+    <!----LeaderBoard-->
+    
+    <div class="card leaderboard-card">
+    <h3>🏆 Leaderboard</h3>
+    <ul class="leaderboard-list">
+    {% for entry in leaderboard %}
+      <li class="leaderboard-item rank{{ loop.index }}">
+        <div class="rank-badge">{{ loop.index }}</div>
+        <div class="leader-info">
+          <span class="leader-name">{{ entry.name }}</span>
+          <span class="leader-score">{{ entry.score }} pts</span>
+        </div>
+      </li>
+    {% endfor %}
+    </ul>
     </div>
 
 <script>
@@ -95,6 +117,47 @@ document.getElementById("simplify-task-btn").addEventListener("click", async () 
 
 </script>
 
-    
+    <script>
+    const timerDisplay = document.getElementById("timer");
+
+function getRemainingSecondsUntil2PM() {
+    const now = new Date();
+    const target = new Date();
+
+    // Set target time to 2 PM today
+    target.setHours(24, 0, 0, 0);
+
+    // If it's already past 2 PM, set target to 2 PM tomorrow
+    if (now >= target) {
+        target.setDate(target.getDate() + 1);
+    }
+
+    // Calculate remaining seconds
+    const diffInSeconds = Math.floor((target - now) / 1000);
+    return diffInSeconds;
+}
+
+let remainingSeconds = getRemainingSecondsUntil2PM();
+
+function updateTimer() {
+    const hrs = String(Math.floor(remainingSeconds / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((remainingSeconds % 3600) / 60)).padStart(2, '0');
+    const secs = String(remainingSeconds % 60).padStart(2, '0');
+
+    timerDisplay.textContent = `${hrs}:${mins}:${secs}`;
+
+    if (remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = "00:00:00";
+        return;
+    }
+
+    remainingSeconds--;
+}
+
+const timerInterval = setInterval(updateTimer, 1000);
+updateTimer();
+
+</script>
 
 {% endblock %}

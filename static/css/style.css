@@ -10,6 +10,7 @@
     --error-color: #dc3545;
     --warning-color: #ffc107;
     --info-color: #17a2b8;
+    --timer-color: rgba(255, 0, 0, 0.721);
 }
 
 body {
@@ -134,6 +135,18 @@ nav a:hover {
     color: var(--primary-color);
 }
 
+.card-time {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--card-bg-color);
+    padding: .1rem 5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    font-size: 1.5rem;
+    color: var(--timer-color);
+}
+
 .task-text {
     font-style: italic;
     font-size: 1.1rem;
@@ -144,13 +157,17 @@ nav a:hover {
 .connect-form {
     display: flex;
     gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
 }
 
 .connect-form input {
     flex-grow: 1;
-    padding: 0.5rem;
+   padding: 0.2rem 5rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    font-size: 1.3rem;
 }
 
 .connect-form button {
@@ -336,6 +353,23 @@ input[type="file"] {
     background-color: #ffcc00;
 }
 
+.logout-btn {
+    background-color: #f19a0ff2;
+    color: #000;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    direction: none;
+
+}
+
+.logout-btn:hover {
+    background-color: #ff6200;
+}
+
 /* Info Section */
 .profile-info p {
     font-size: 1rem;
@@ -394,43 +428,80 @@ nav {
     bottom: 0;
 }
 
-.suggestion-card {
-  background: linear-gradient(135deg, #e0ffe8, #f0fff4);
-  border-left: 5px solid #4CAF50;
-  border-radius: 15px;
-  padding: 15px 20px;
-  margin-top: 10px;
-  font-family: "Poppins", sans-serif;
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
-  animation: fadeIn 0.6s ease;
+/* --------- Leaderboard Styles --------- */
+.leaderboard-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.suggestion-header {
+.leaderboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+.leaderboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leaderboard-item {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 14px;
+  padding: 10px 14px;
+  transition: all 0.25s ease;
 }
 
-.suggestion-title {
+.leaderboard-item:hover {
+  background: rgba(255,255,255,0.8);
+  transform: scale(1.02);
+}
+
+.rank-badge {
+  font-weight: 700;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* top 3 rank colors */
+.rank1 .rank-badge { background: linear-gradient(135deg, #ffd700, #ffcd38); }
+.rank2 .rank-badge { background: linear-gradient(135deg, #c0c0c0, #d6d6d6); }
+.rank3 .rank-badge { background: linear-gradient(135deg, #cd7f32, #d49a6a); }
+.rank4 .rank-badge,
+.rank5 .rank-badge,
+.rank6 .rank-badge { background: linear-gradient(135deg, #7b6bff, #b38b59); }
+
+.leader-info {
+  text-align: right;
+}
+
+.leader-name {
   font-weight: 600;
-  color: #2e7d32;
-  margin-left: 8px;
-  font-size: 1rem;
+  color: #2c3e50;
+  display: block;
+  font-size: 15px;
 }
 
-.sparkle {
-  font-size: 1.3rem;
+.leader-score {
+  color: #777;
+  font-size: 13px;
 }
-
-.suggestion-text {
-  font-size: 0.95rem;
-  color: #1b5e20;
-  line-height: 1.5;
-  margin: 0;
-  font-style: italic;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+style.css
