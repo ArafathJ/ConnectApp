@@ -355,6 +355,11 @@ def add_connection():
         return redirect(url_for('dashboard'))
     
     current_user.add_friend(friend_to_add)
+
+    SCORE_REWARD = 20  # You can change this
+    current_user.score += SCORE_REWARD
+    friend_to_add.score += SCORE_REWARD
+
     db.session.commit()
     flash(f'Successfully connected with {friend_to_add.name}!', 'success')
     return redirect(url_for('dashboard'))
