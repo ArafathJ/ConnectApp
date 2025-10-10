@@ -76,10 +76,14 @@ class DailyTask(db.Model):
 
 class ReferralHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    referrer_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    referred_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    referrer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    referred_id = db.Column(db.Integer, db.ForeignKey('user.id') , nullable = False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    
+    referrer = db.relationship('User', foreign_keys=[referrer_id], backref='referrals_made')
+    referred = db.relationship('User', foreign_keys=[referred_id], backref='referrals_received')
 
+    
     def __repr__(self):
         return f'<Task {self.task_text}>'

@@ -11,7 +11,7 @@ from google import genai
 from sample import GEMINI_API_KEY
 from datetime import datetime, date, timedelta
 from referal import generate_referral_code
-
+from models import ReferralHistory
 
 
 # Optional QR Code generation
@@ -125,53 +125,55 @@ def register():
         password = request.form.get('password')
         referral = request.form.get('referral')
 
-        # Check if user already exists
+        # Check if email already registered
         user_exists = User.query.filter_by(email=email).first()
         if user_exists:
             flash('An account with this email already exists.', 'error')
             return redirect(url_for('register'))
 
-        # Create new user
+        # Create new user object
         new_user = User(
             name=name,
             age=age,
             email=email,
-            password=password,
             referral_code=User.generate_referral_code()
         )
+        new_user.set_password(password)
 
-        # Handle referral logic
         if referral:
             referrer = User.query.filter_by(referral_code=referral).first()
             if referrer:
-                # ✅ Check if this referral was already used
-                already_used = ReferralHistory.query.filter_by(referred_id=referrer.id).first()
-                if already_used:
-                    flash('This referral code has already been used once and cannot be reused.', 'error')
+                # ✅ Check if this email already used this referral code before
+                existing_referral = ReferralHistory.query.filter_by(
+                    referrer_id=referrer.id, referred_email=email
+                ).first()
+
+                if existing_referral:
+                    flash('You have already used this referral code before.', 'warning')
                 else:
-                    # ✅ Reward both users
+                    # Save referral history
+                    history = ReferralHistory(
+                        referrer_id=referrer.id,
+                        referred_email=email
+                    )
+                    db.session.add(history)
+
+                    # Reward both users
                     referrer.score += 20
                     new_user.score += 20
 
-                    # ✅ Mark referral in history
-                    record = ReferralHistory(
-                        referrer_id=referrer.id,
-                        referred_id=new_user.id,
-                        date=datetime.utcnow()
-                    )
-                    db.session.add(record)
-
-                    # Optionally mark today’s task as complete for referrer
+                    # Optionally complete today's task for referrer
                     today = datetime.date.today()
                     task = DailyTask.query.filter_by(user_id=referrer.id, task_date=today).first()
                     if task and not task.completed:
                         task.completed = True
                         task.xp_points = 20
             else:
-                flash("Invalid referral code entered.", "error")
+                flash('Invalid referral code entered.', 'error')
 
         db.session.add(new_user)
         db.session.commit()
+
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('login'))
 
