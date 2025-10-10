@@ -9,7 +9,7 @@ from models import db, User, DailyTask
 from werkzeug.utils import secure_filename
 from google import genai
 from sample import GEMINI_API_KEY
-
+from datetime import datetime, date, timedelta
 
 
 
@@ -37,31 +37,6 @@ client = genai.Client(api_key=GEMINI_API_KEY)
 
 
 
-@app.route("/ai_suggest", methods=["POST"])
-def ai_suggest():
-    """Generate AI suggestion for a given task text."""
-    data = request.get_json()
-    task_text = data.get("task", "")
-    if not task_text:
-        return jsonify({"error": "Task text missing"}), 400
-
-    prompt = f"""
-    You are an assistant helping users plan their daily tasks.
-    The task is: "{task_text}"
-    Give only 1-2 short, practical steps on how to approach this task effectively.
-    Keep it friendly and under 50 words.
-    """
-
-    try:
-        response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=prompt
-        )
-        print(response.text)
-
-    except Exception as e:
-        print(e)
-        return jsonify({"error": "AI suggestion failed"}), 500
-    
 # --- for uploading provision file format------
 
 def allowed_file(filename):
@@ -88,19 +63,52 @@ def get_daily_task(user):
     """Gets or creates a new daily task for the user."""
     today = date.today()
     task = DailyTask.query.filter_by(user_id=user.id, task_date=today).first()
+
     if not task:
-        task_list = [
-            "Talk to someone new today and get their referral code.",
-            "Introduce yourself to a stranger and exchange codes.",
-            "Ask a cashier or barista for their referral code.",
-            "Compliment a stranger and offer your referral code.",
-            "Find someone with the same favorite color and connect."
-        ]
-        task_text = random.choice(task_list)
+        prompt = f"""
+        You are an assistant creating a unique social challenge for the user.
+        The challenge should encourage friendly interactions or small social acts.
+        Examples:
+        - Talk to a stranger and learn one fun fact about them.
+        - Compliment someone genuinely today.
+        - Ask someone about their favorite movie or music.
+        - The difficultly level of daily mission increases by weeks or months
+
+        Generate **one or two short daily mission and you must ask for atleast one connection** (max 20 words).
+        Make it simple, positive, and social.
+        """
+
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+
+            # Handle possible response formats
+            task_text = getattr(response, "text", None)
+            if not task_text and hasattr(response, "candidates"):
+                task_text = response.candidates[0].content[0].text.strip()
+
+            if not task_text:
+                raise ValueError("Empty Gemini response")
+
+        except Exception as e:
+            print("❌ Gemini Task Generation Error:", e)
+            # Fallback if Gemini fails
+            fallback_tasks = [
+                "Talk to someone new today and get their referral code.",
+                "Introduce yourself to a stranger and exchange codes.",
+                "Compliment someone and share your referral code."
+            ]
+            task_text = random.choice(fallback_tasks)
+
+        # Save the task to the database
         task = DailyTask(user_id=user.id, task_text=task_text, task_date=today)
         db.session.add(task)
         db.session.commit()
+
     return task
+
 
 # --- Routes ---
 
@@ -162,6 +170,103 @@ def dashboard():
     task = get_daily_task(current_user)
     connections = current_user.friends.limit(5).all() # Show a few on the dashboard
     return render_template('dashboard.html', user=current_user, task=task, connections=connections)
+
+@app.route("/ai_suggest", methods=["POST"])
+@login_required
+def ai_suggest():
+    """Generate AI suggestion for a given task text."""
+    data = request.get_json()
+    task_text = data.get("task", "")
+    if not task_text:
+        return jsonify({"error": "Task text missing"}), 400
+
+    prompt = f"""
+    You are an assistant helping users plan their daily tasks.
+    The task is: "{task_text}"
+    Give only 1-2 short, practical steps on how to approach this task effectively.
+    Keep it friendly and under 50 words.
+    """
+
+    try:
+        # Call Gemini API
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", contents=prompt
+        )
+        suggestion = getattr(response, "text", None)
+        if not suggestion and hasattr(response, "candidates"):
+            suggestion = response.candidates[0].content[0].text.strip()
+
+        if  not suggestion:
+            raise ValueError("Empty response from Gemini")
+        
+        return jsonify({"suggestion": suggestion})
+
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "AI suggestion failed"}), 500
+
+
+@app.route("/simplify_task", methods=["POST"])
+@login_required
+def simplify_task():
+    data = request.get_json()
+    task_text = data.get("task", "")
+    
+    if not task_text:
+        return jsonify({"error": "Task text missing"}), 400
+
+    # Get today's task
+    task = DailyTask.query.filter_by(
+        user_id=current_user.id, task_text=task_text, task_date=date.today()
+    ).first()
+
+    if not task:
+        return jsonify({"error": "Task not found"}), 404
+
+    # Check if simplified 3 times this week
+    week_start = date.today() - timedelta(days=date.today().weekday())  # Monday
+    week_end = week_start + timedelta(days=6)
+    weekly_simplified_count = DailyTask.query.filter(
+        DailyTask.user_id==current_user.id,
+        DailyTask.task_date.between(week_start, week_end),
+        DailyTask.difficulty_level=="easy"
+    ).count()
+
+    if weekly_simplified_count >= 3:
+        return jsonify({"error": "You can only simplify tasks 3 times per week"}), 403
+
+    # Generate a simpler task using Gemini
+    prompt = f"""
+    You are an assistant. Make this task easier and simpler so the user can complete it quickly:
+    Original task: "{task.task_text}"
+    Give one short, easy, achievable version (max 15 words).
+    """
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", contents=prompt
+        )
+        simplified_text = getattr(response, "text", None)
+        if not simplified_text and hasattr(response, "candidates"):
+            simplified_text = response.candidates[0].content[0].text.strip()
+
+        if not simplified_text:
+            raise ValueError("Empty response from Gemini")
+
+        # Save simplified task
+        task.task_text = simplified_text
+        task.difficulty_level = "easy"
+        task.simplified_count += 1
+        db.session.commit()
+
+        return jsonify({"task": simplified_text})
+
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "Simplifying task failed"}), 500
+
+
+
 
 @app.route('/add_connection', methods=['POST'])
 @login_required

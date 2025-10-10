@@ -61,12 +61,15 @@ class User(UserMixin, db.Model):
         return f'<User {self.name}>'
 
 class DailyTask(db.Model):
-    """DailyTask model for storing user's daily tasks."""
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     task_text = db.Column(db.String(255), nullable=False)
+    suggestion = db.Column(db.Text, nullable=True)
     completed = db.Column(db.Boolean, default=False)
-    task_date = db.Column(db.Date, nullable=False, default=date.today)
+    task_date = db.Column(db.Date, nullable=False)
+    difficulty_level = db.Column(db.String(50), default="normal")  # "normal" or "easy"
+    simplified_count = db.Column(db.Integer, default=0)  # how many times simplified this week
+
 
     def __repr__(self):
         return f'<Task {self.task_text}>'

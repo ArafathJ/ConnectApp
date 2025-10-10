@@ -393,3 +393,44 @@ nav {
     top: 1px;
     bottom: 0;
 }
+
+.suggestion-card {
+  background: linear-gradient(135deg, #e0ffe8, #f0fff4);
+  border-left: 5px solid #4CAF50;
+  border-radius: 15px;
+  padding: 15px 20px;
+  margin-top: 10px;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+  animation: fadeIn 0.6s ease;
+}
+
+.suggestion-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.suggestion-title {
+  font-weight: 600;
+  color: #2e7d32;
+  margin-left: 8px;
+  font-size: 1rem;
+}
+
+.sparkle {
+  font-size: 1.3rem;
+}
+
+.suggestion-text {
+  font-size: 0.95rem;
+  color: #1b5e20;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

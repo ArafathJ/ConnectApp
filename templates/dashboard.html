@@ -7,16 +7,16 @@
     </div>
 
     <div class="card">
-        <h3>Today's Mission</h3>
-        <p class="task-text">"{{ task.task_text }}"</p>
-        <div class="task-item">
-        <p>{{ task.description }}</p>
-        <button class="ai-btn" onclick="getSuggestion('{{ task.description }}', this)">
-    💡 AI Suggest
+    <h3>Today's Mission</h3>
+    <p class="task-text">{{ task.task_text }}</p>
+    <button class="ai-btn" onclick="getSuggestion('{{ task.task_text }}', this)">
+        💡 AI Suggest
     </button>
-  <div class="suggestion" style="margin-top:5px; color:#4CAF50;"></div>
+    <button id="simplify-task-btn">Simplify Task</button>
+    <div class="simplified-task"></div>
+
+    <div class="suggestion" style="margin-top:5px; color:#4CAF50;"></div>
 </div>
-    </div>
 
     <div class="card">
         <h3>Connect with Someone New</h3>
@@ -41,26 +41,60 @@
         {% endif %}
     </div>
 
-    <script>
-        async function getSuggestion(task, btn) {
-        btn.innerText = "Thinking...";
-        try {
-            const res = await fetch("/ai_suggest", {
+<script>
+
+    function getSuggestion(taskText, btn) {
+    const card = btn.closest('.card');
+    const suggestionDiv = card.querySelector('.suggestion');
+    suggestionDiv.textContent = "Loading suggestion...";
+
+    fetch("/ai_suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task: taskText })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.suggestion) {
+            suggestionDiv.textContent = data.suggestion;
+        } else if (data.error) {
+            suggestionDiv.textContent = "Failed to get suggestion";
+            console.error(data.error);
+        }
+    })
+    .catch(err => {
+        suggestionDiv.textContent = "Error fetching suggestion";
+        console.error(err);
+    });
+}
+
+document.getElementById("simplify-task-btn").addEventListener("click", async () => {
+    const simplifiedDiv = document.querySelector(".simplified-task");
+    simplifiedDiv.innerHTML = "Simplifying...";
+
+    try {
+        const response = await fetch("/simplify_task", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ task })
+            body: JSON.stringify({ task: {{ task.task_text|tojson }} })
         });
-            const data = await res.json();
-            if (data.suggestion) {
-            btn.nextElementSibling.innerHTML = `<b>Suggestion:</b> ${data.suggestion}`;
+
+        const data = await response.json();
+
+        if (data.task) {
+            simplifiedDiv.innerHTML = "New Task: " + data.task;
         } else {
-        btn.nextElementSibling.innerHTML = "⚠️ Failed to get suggestion.";
+            simplifiedDiv.innerHTML = data.error || "Failed to simplify 😕";
         }
     } catch (err) {
-        btn.nextElementSibling.innerHTML = "⚠️ Error connecting to AI.";
+        simplifiedDiv.innerHTML = "Failed to simplify 😕";
+        console.error(err);
     }
-        btn.innerText = "💡 AI Suggest";
-    }
-    </script>
+});
+
+
+</script>
+
+    
 
 {% endblock %}
