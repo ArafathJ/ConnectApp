@@ -1,6 +1,6 @@
-Flask
-Flask-SQLAlchemy
-Flask-Login
-Flask-Bcrypt
+flask
+flask-sqlalchemy
+flask-login
+flask-bcrypt
 qrcode
-Pillow
+pillow
