@@ -4,19 +4,19 @@ This is a full-stack web application built with Python Flask that aims to reduce
 
 ## Features
 
--   User registration and authentication.
--   Unique referral code for each user.
--   QR code generation for easy sharing.
--   Connection system based solely on referral codes (no user search).
--   Daily icebreaker tasks to encourage interaction.
--   Dashboard, Profile, and Connections pages.
+- User registration and authentication.
+- Unique referral code for each user.
+- QR code generation for easy sharing.
+- Connection system based solely on referral codes (no user search).
+- Daily icebreaker tasks to encourage interaction.
+- Dashboard, Profile, and Connections pages.
 
 ## Tech Stack
 
--   **Backend**: Python, Flask, Flask-SQLAlchemy, Flask-Login
--   **Database**: SQLite
--   **Frontend**: HTML, CSS
--   **QR Generation**: `qrcode` library
+- **Backend**: Python, Flask, Flask-SQLAlchemy, Flask-Login
+- **Database**: SQLite
+- **Frontend**: HTML, CSS
+- **QR Generation**: `qrcode` library
 
 ## Setup and Installation
 
@@ -24,13 +24,39 @@ Follow these steps to run the application locally.
 
 ### 1. Prerequisites
 
--   Python 3.6+
--   `pip` package installer
+- Python 3.6+
+- `pip3` package installer
 
 ### 2. Clone the Repository
 
 Clone this project to your local machine (or simply create the files as described).
 
 ```bash
-git clone <repository-url>
-cd social_app
+git clone https://github.com/ArafathJ/ConnectApp.git
+cd ConnectApp
+```
+
+### 3. Create a Virtual Environment
+
+Create a virtual environment to manage dependencies.
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+```
+
+### 4. Install Dependencies
+
+Install the required Python packages.
+
+```bash
+pip3 install -r requirements.txt
+```
+
+### 5. Set Up Environment Variables
+
+Create a `.env` file in the root directory and add the following:
+
+```env
+GEMINI_API_KEY=your_secret_key
+```
