@@ -1,4 +1,4 @@
-# Social Connection App
+# ConnectApp
 
 This is a full-stack web application built with Python Flask that aims to reduce social anxiety by promoting real-life interactions. Users can only connect with others by exchanging unique referral codes.
 
