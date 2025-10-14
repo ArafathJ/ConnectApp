@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Connections{% endblock %}
+{% block content %}
+<div class="card">
+  <h3>Your Connections</h3>
+  {% if friends %}
+    <ul class="connections-list">
+    {% for friend in friends %}
+      <li>
+        <span class="friend-name">{{ friend.name }}</span> 
+        <span class="friend-age">(Age: {{ friend.age }})</span><br>
+        <span class="friend-email">{{ friend.email }}</span>
+      </li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have no connections yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

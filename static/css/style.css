@@ -163,12 +163,26 @@ nav a:hover {
     padding: 0.5rem;
 }
 
-.connect-form input {
-    flex-grow: 1;
-   padding: 0.2rem 5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 1.3rem;
+/* improved connect-form input field */
+.connect-form input[type="text"] {
+    width: 100%;
+    padding: 0.85rem 1.3rem;
+    border: 2px solid var(--primary-color);
+    border-radius: 7px;
+    background: #f4f9fd;
+    color: #234;
+    font-size: 1.19rem;
+    margin-right: 0.9rem;
+    box-sizing: border-box;
+    font-family: inherit;
+    transition: box-shadow 0.17s, border-color 0.17s;
+    box-shadow: 0 2px 11px rgba(120,180,255,.1);
+}
+.connect-form input[type="text"]:focus {
+    outline: 0;
+    border-color: #369cff;
+    box-shadow: 0 0 0 3px #369cff23;
+    background: #eaf6fb;
 }
 
 .connect-form button {
@@ -221,7 +235,7 @@ nav a:hover {
     border: 1px solid var(--border-color);
     padding: 1rem;
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.5 rem;
     font-weight: bold;
     letter-spacing: 2px;
     border-radius: 4px;
@@ -554,3 +568,30 @@ nav {
  
  
  /* ai inbox ends */
+
+/* Dashboard popup (referral code feedback) */
+.dashboard-popup {
+  position: fixed;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.92);
+  background: #ffffff;
+  color: #333;
+  padding: 18px 36px;
+  border-radius: 11px;
+  box-shadow: 0 8px 40px rgba(60,100,160,0.11), 0 1.5px 6px #007bff22;
+  font-size: 1.25rem;
+  font-weight: 600;
+  opacity: 0;
+  z-index: 9999;
+  transition: opacity 0.32s, transform 0.39s;
+  border-left: 8px solid #007bff;
+  pointer-events: none;
+}
+.dashboard-popup.info { border-left-color: #17a2b8; }
+.dashboard-popup.success { border-left-color: #28a745; color: #246834; }
+.dashboard-popup.danger { border-left-color: #dc3545; color: #851717; }
+.dashboard-popup.show {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
