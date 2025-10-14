@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <img class="profile-img" src="{{ url_for('static', filename='profile_pics/' ~ current_user.profile_pic) }}" alt="Profile picture">
+      <div class="profile-name">{{ current_user.name }}</div>
+      <div class="profile-email">{{ current_user.email }}</div>
+    </div>
+    <div class="profile-info">
+      <p>Age: {{ current_user.age }}</p>
+      <p>Score: <b>{{ current_user.score }}</b></p>
+      <div class="referral-section">
+        <div>Referral Code:</div>
+        <div class="referral-code">{{ current_user.referral_code }}</div>
+      </div>
+    </div>
+    <form class="upload-form" action="" method="POST" enctype="multipart/form-data">
+      <label class="upload-label">Update profile picture:</label>
+      <input type="file" name="profile_pic" accept="image/*">
+      <button class="upload-btn" type="submit">Upload</button>
+    </form>
+    <a class="logout-btn" href="{{ url_for('auth.logout') }}">Logout</a>
+  </div>
+</div>
+{% endblock %}

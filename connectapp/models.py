@@ -1,12 +1,10 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import string
 import random
 from datetime import datetime
 from datetime import date
-
-db = SQLAlchemy()
+from connectapp.extensions import db
 
 # Association table for the many-to-many relationship
 connections = db.Table('connections',
@@ -31,11 +29,11 @@ class User(UserMixin, db.Model):
 
     # Many-to-many relationship for connections
     friends = db.relationship('User', 
-                              secondary=connections, 
-                              primaryjoin=(connections.c.user_id == id), 
-                              secondaryjoin=(connections.c.friend_id == id),
-                              backref=db.backref('followers', lazy='dynamic'), 
-                              lazy='dynamic')
+                             secondary=connections, 
+                             primaryjoin=(connections.c.user_id == id), 
+                             secondaryjoin=(connections.c.friend_id == id),
+                             backref=db.backref('followers', lazy='dynamic'), 
+                             lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
