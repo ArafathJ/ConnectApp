@@ -3,3 +3,4 @@ venv/
 **/__pycache__/
 *.pyc
 social.db
+instance/
