@@ -188,6 +188,21 @@ nav a:hover {
 .connect-form button {
     padding: 0.5rem 1rem;
     white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.connect-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-loading {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .view-all {
@@ -399,6 +414,7 @@ input[type="file"] {
 
 .referral-code {
     background: linear-gradient(45deg, #FFD700, #FFB700, #FFA500);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 700;
@@ -594,4 +610,101 @@ nav {
 .dashboard-popup.show {
   opacity: 1;
   transform: translateX(-50%) scale(1);
+}
+
+/* Success celebration popup */
+.success-celebration {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border-left: 8px solid #1e7e34;
+  box-shadow: 0 12px 50px rgba(40, 167, 69, 0.3), 0 4px 15px rgba(40, 167, 69, 0.2);
+  animation: successPulse 0.6s ease-out;
+}
+
+.celebration-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.celebration-emoji {
+  font-size: 2rem;
+  animation: bounce 1s infinite;
+}
+
+.celebration-text {
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Particle explosion animation */
+@keyframes particleExplosion {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--x), var(--y)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* Success pulse animation */
+@keyframes successPulse {
+  0% { transform: translateX(-50%) scale(0.8); }
+  50% { transform: translateX(-50%) scale(1.1); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+/* Bounce animation for emoji */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+
+/* Welcome popup styling */
+.welcome-popup {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-left: 8px solid #004085;
+  box-shadow: 0 12px 50px rgba(0, 123, 255, 0.3), 0 4px 15px rgba(0, 123, 255, 0.2);
+  animation: welcomePulse 0.6s ease-out;
+}
+
+.welcome-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-emoji {
+  font-size: 2rem;
+  animation: wave 1.5s ease-in-out infinite;
+}
+
+.welcome-text {
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Welcome pulse animation */
+@keyframes welcomePulse {
+  0% { transform: translateX(-50%) scale(0.8); }
+  50% { transform: translateX(-50%) scale(1.05); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+/* Wave animation for welcome emoji */
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
 }

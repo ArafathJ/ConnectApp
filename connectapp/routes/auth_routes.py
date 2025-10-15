@@ -19,17 +19,18 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password):
             login_user(user)
-            flash('Logged in successfully!', 'success')
+            flash(f'🎉 Welcome back, {user.name}! 🎉', 'success')
             return redirect(url_for('dashboard.dashboard'))
         else:
-            flash('Invalid email or password', 'danger')
+            flash('❌ Invalid email or password. Please try again.', 'danger')
     return render_template('login.html')
 
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    user_name = current_user.name
     logout_user()
-    flash('Logged out successfully.', 'success')
+    flash(f'👋 Goodbye, {user_name}! See you soon! 👋', 'success')
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -42,12 +43,12 @@ def register():
         email = request.form['email']
         password = request.form['password']
         if User.query.filter_by(email=email).first():
-            flash('Email already registered', 'warning')
+            flash('⚠️ Email already registered. Please use a different email.', 'warning')
             return redirect(url_for('auth.register'))
         user = User(name=name, age=age, email=email, referral_code=User.generate_referral_code())
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-        flash('Registration successful! Please log in.', 'success')
+        flash('🎊 Registration successful! Welcome to ConnectApp! 🎊 Please log in to continue.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('register.html')

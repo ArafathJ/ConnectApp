@@ -8,11 +8,14 @@
 <div class="card" style="max-width:700px; margin:32px auto;">
   <h3>Today's Mission</h3>
   <div class="mission-highlight" style="display:flex; align-items:center; justify-content:center;">
-    <span style="display:inline-block; background:linear-gradient(100deg, #f0f6ff 80%, #eaf7fd 100%); font-size:2.0em; font-weight:900; letter-spacing:.01em; color:#2666c8; border-left:12px solid #369cff; box-shadow:0 2px 13px rgba(50,100,210,.07), 0 1.5px 3px rgba(90,124,240,.08); border-radius:0 22px 22px 0; padding:27px 48px 27px 32px; margin:0 0 24px 0; line-height:1.25; outline:2.5px solid #0099ff26; outline-offset:2px; transition:.2s; filter:drop-shadow(0 2px 5px #6cb7ff16);">{{ simplified_task or task.task_text }}</span>
+    <span style="display:inline-block; background:linear-gradient(100deg, #f0f6ff 80%, #eaf7fd 100%); font-size:2.0em; font-weight:900; letter-spacing:.01em; color:#2666c8; border-left:12px solid #369cff; box-shadow:0 2px 13px rgba(50,100,210,.07), 0 1.5px 3px rgba(90,124,240,.08); border-radius:0 22px 22px 0; padding:27px 48px 27px 32px; margin:0 0 24px 0; line-height:1.25; outline:2.5px solid #0099ff26; outline-offset:2px; transition:.2s; filter:drop-shadow(0 2px 5px #6cb7ff16);">{{ task.task_text }}</span>
   </div>
-  <form class="connect-form" method="POST" action="">
-    <input type="text" name="referral_code" placeholder="Enter referral code to connect...">
-    <button class="btn" type="submit">Connect</button>
+  <form class="connect-form" method="POST" action="" id="connectForm">
+    <input type="text" name="referral_code" placeholder="Enter referral code to connect..." required>
+    <button class="btn connect-btn" type="submit" id="connectBtn">
+      <span class="btn-text">Connect</span>
+      <span class="btn-loading" style="display: none;">🔄 Connecting...</span>
+    </button>
   </form>
 </div>
 <div class="card suggestion-out" style="max-width:850px; min-width:350px; margin:52px auto 36px auto; background:linear-gradient(145deg,#e3e9ef 60%,#fff 100%); padding:2.0rem 2.3rem; box-shadow:0 8px 32px rgba(60,90,130,0.13); border-radius:22px;">
@@ -54,9 +57,32 @@
 <script src="{{ url_for('static', filename='js/dashboard_popup.js') }}"></script>
 <script>
 startTimer({{ time_remaining }});
+
+// Handle connect button loading state
+document.getElementById('connectForm').addEventListener('submit', function() {
+  const btn = document.getElementById('connectBtn');
+  const btnText = btn.querySelector('.btn-text');
+  const btnLoading = btn.querySelector('.btn-loading');
+  
+  btnText.style.display = 'none';
+  btnLoading.style.display = 'inline';
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+});
+
 {% for category, message in get_flashed_messages(with_categories=True) %}
-  {% if category=='info' and 'Already connected' in message %}
+  {% if category == 'success' and ('Connection established' in message or 'connected with' in message) %}
+    showSuccessPopup({{ message|tojson }}, 'success');
+  {% elif category == 'success' and ('Welcome back' in message or 'Registration successful' in message) %}
+    showWelcomePopup({{ message|tojson }}, 'success');
+  {% elif category == 'success' %}
+    showPopup({{ message|tojson }}, 'success');
+  {% elif category == 'info' %}
     showPopup({{ message|tojson }}, 'info');
+  {% elif category == 'danger' %}
+    showPopup({{ message|tojson }}, 'danger');
+  {% elif category == 'warning' %}
+    showPopup({{ message|tojson }}, 'warning');
   {% endif %}
 {% endfor %}
 </script>

@@ -67,7 +67,8 @@ class DailyTask(db.Model):
     suggestion = db.Column(db.Text, nullable=True)
     completed = db.Column(db.Boolean, default=False)
     task_date = db.Column(db.Date, nullable=False)
-    difficulty_level = db.Column(db.String(50), default="normal")  # "normal" or "easy"
+    difficulty = db.Column(db.String(20), default="medium")  # "easy", "medium", "hard"
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     simplified_count = db.Column(db.Integer, default=0)  # how many times simplified this week
     xp_points = db.Column(db.Integer, default=10)
 

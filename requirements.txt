@@ -4,3 +4,4 @@ flask-login
 flask-bcrypt
 qrcode
 pillow
+google-generativeai
